@@ -111,6 +111,9 @@ st.write(
 
 # ── Sample Selection Quick Buttons ───────────────────────────────────────────
 st.markdown("##### ⚡ Quick Test with Repository Samples:")
+if "active_sample" not in st.session_state:
+    st.session_state["active_sample"] = "sample_images/T-shirt.png" if os.path.exists("sample_images/T-shirt.png") else None
+
 sample_cols = st.columns(7)
 sample_map = [
     ("👕 T-shirt", "sample_images/T-shirt.png"),
@@ -122,14 +125,12 @@ sample_map = [
     ("👢 Ankle boot", "sample_images/Ankle_boot.png")
 ]
 
-selected_sample_img = None
 for i, (label, path) in enumerate(sample_map):
     with sample_cols[i]:
         if st.button(label, use_container_width=True):
-            if os.path.exists(path):
-                selected_sample_img = Image.open(path)
+            st.session_state["active_sample"] = path
 
-# ── File Upload ──────────────────────────────────────────────────────────────
+# ── File Upload & Image Resolution ───────────────────────────────────────────
 col_upload, col_preview = st.columns([1.2, 1])
 
 with col_upload:
@@ -138,20 +139,30 @@ with col_upload:
         type=["jpg", "jpeg", "png"],
         help="Upload clear photos of clothing items"
     )
+    if st.session_state.get("active_sample") and uploaded_file is None:
+        st.caption(f"Currently testing: `{os.path.basename(st.session_state['active_sample'])}`")
 
 active_image = None
 if uploaded_file is not None:
     active_image = Image.open(uploaded_file)
-elif selected_sample_img is not None:
-    active_image = selected_sample_img
+elif st.session_state.get("active_sample") and os.path.exists(st.session_state["active_sample"]):
+    active_image = Image.open(st.session_state["active_sample"])
 
 if active_image is not None:
     with col_preview:
-        st.image(active_image, caption="Selected Image", use_container_width=True)
+        st.image(active_image, caption="Active Input Image", use_container_width=True)
 
     # ── Image Preprocessing ──────────────────────────────────────────────────
-    img_gray = active_image.convert("L").resize((28, 28))
-    img_array = np.array(img_gray).astype("float32") / 255.0
+    # Handle RGBA/transparency: composite on white canvas before grayscale conversion
+    if active_image.mode in ("RGBA", "LA") or (active_image.mode == "P" and "transparency" in active_image.info):
+        rgba_img = active_image.convert("RGBA")
+        white_bg = Image.new("RGBA", rgba_img.size, (255, 255, 255, 255))
+        clean_img = Image.alpha_composite(white_bg, rgba_img).convert("L")
+    else:
+        clean_img = active_image.convert("L")
+
+    img_resized = clean_img.resize((28, 28), Image.Resampling.LANCZOS)
+    img_array = np.array(img_resized).astype("float32") / 255.0
 
     # Auto-inversion if background is bright (Fashion MNIST is bright subject on dark background)
     if np.mean(img_array) > 0.5:

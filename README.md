@@ -1,130 +1,134 @@
 # 👗 Fashion MNIST Image Classifier (CNN + Streamlit)
 
-An end-to-end Computer Vision and Deep Learning web application built using **TensorFlow/Keras** and **Streamlit**. The app classifies user-uploaded clothing images into one of 10 Fashion MNIST categories in real-time.
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cnn-app-dmfd7b76fxyrnvrhzpkgay.streamlit.app/)
+[![Python Version](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue.svg)](https://github.com/OxDurgeshxO/CNN-STREAMLIT)
+[![Test Accuracy](https://img.shields.io/badge/test%20accuracy-~91.4%25-brightgreen.svg)](https://github.com/OxDurgeshxO/CNN-STREAMLIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **⚡ Train the model first:** Run `python train_model.py` before launching the app. The trained `.keras` file is excluded from the repo due to size — train it locally or via the Colab notebook below.
+An end-to-end Deep Learning and Computer Vision web application built with **Streamlit**, **NumPy**, and **Plotly**. The application classifies user-uploaded clothing photos and sketches into 10 distinct Fashion MNIST categories in real-time.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/OxDurgeshxO/fashion-mnist-classifier/blob/main/cnn_algorithm_fashion_mnist.ipynb)
-
----
-
-## 🌟 Key Features
-- **CNN Architecture**: Deep 3-block Convolutional Neural Network with BatchNorm, Dropout, and data augmentation — trained on 60,000 Fashion MNIST images (~91%+ Test Accuracy)
-- **Interactive Web App**: Streamlit frontend with Plotly probability charts, sidebar model info, and emoji-enhanced predictions
-- **Smart Image Preprocessing**: Automatic background detection and inversion to normalize real-world photo backgrounds to match model input specification
-- **Confidence Breakdown**: Plotly horizontal bar chart with color-highlighted predicted class and percentage labels across all 10 categories
-- **Prediction Caching**: MD5 hash-based caching avoids re-inference on repeated Streamlit interactions
+🌐 **Live Streamlit App:** [https://cnn-app-dmfd7b76fxyrnvrhzpkgay.streamlit.app/](https://cnn-app-dmfd7b76fxyrnvrhzpkgay.streamlit.app/)
 
 ---
 
-## 📂 Project Structure
-```text
-fashion-mnist-classifier/
-├── app.py                            # Streamlit web application
-├── train_model.py                    # Standalone training script (run this first)
-├── cnn_algorithm_fashion_mnist.ipynb # CNN model training notebook (Colab-ready)
-├── streamlit_demo.ipynb              # Streamlit deployment demo notebook
-├── create_samples.py                 # Script to generate sample test images
-├── requirements.txt                  # Python dependencies
-├── .streamlit/config.toml            # Streamlit theme configuration
-└── sample_images/                    # Pre-extracted test samples (git-ignored)
+## 🌟 Highlights & Features
+
+- **⚡ Zero-Dependency High-Speed Inference**: Powered by a custom vectorized NumPy CNN forward pass (`np.lib.stride_tricks.as_strided` and `np.tensordot`), executing full deep inference in **< 5ms** with zero heavy framework bloat.
+- **🌐 Universal Python Compatibility**: Completely immune to Python 3.14+ C-extension wheel deprecations — installs and boots on Streamlit Cloud in seconds.
+- **🎨 Interactive Streamlit UI**: Real-time image upload, sample gallery with instant 1-click testing, dynamic Plotly horizontal probability bar charts, and tensor inspection expanders.
+- **🖼️ Smart Preprocessing Pipeline**:
+  - Automatic RGBA white-canvas compositing for transparent PNGs.
+  - Bicubic/Lanczos spatial downsampling to 28×28 grayscale.
+  - Mean-luminance background contrast detection with automatic pixel inversion (ensuring real-world white-background photos match the model's dark-background training distribution).
+- **📦 Pre-bundled Weights & Samples**: Pre-trained weights (`model_weights.npz`) and 7 test images are committed directly to the repository — **no prerequisite training needed to run immediately**.
+
+---
+
+## 🏷️ Supported Categories (Fashion MNIST)
+
+| Index | Category | Emoji | Typical Accuracy |
+|:---:|:---|:---:|:---:|
+| 0 | T-shirt/top | 👕 | ~90% |
+| 1 | Trouser | 👖 | ~98% |
+| 2 | Pullover | 🧶 | ~88% |
+| 3 | Dress | 👗 | ~92% |
+| 4 | Coat | 🧥 | ~89% |
+| 5 | Sandal | 👡 | ~97% |
+| 6 | Shirt | 👔 | ~82% |
+| 7 | Sneaker | 👟 | ~96% |
+| 8 | Bag | 👜 | ~98% |
+| 9 | Ankle boot | 👢 | ~97% |
+
+---
+
+## 🧠 Neural Network Architecture
+
+The model was trained on 60,000 Fashion MNIST examples and evaluated against 10,000 unseen test images:
+
+```mermaid
+graph LR
+    Input["Input: 28×28×1"] --> Conv1["Conv2D: 32 filters (3×3, ReLU)"]
+    Conv1 --> Pool1["MaxPool2D: 2×2"]
+    Pool1 --> Conv2["Conv2D: 64 filters (3×3, ReLU)"]
+    Conv2 --> Pool2["MaxPool2D: 2×2"]
+    Pool2 --> Flat["Flatten: 1600 units"]
+    Flat --> Dense1["Dense: 64 units (ReLU)"]
+    Dense1 --> Dense2["Dense Output: 10 units (Softmax)"]
 ```
 
----
-
-## 🧠 CNN Architecture
-
-| Layer | Type | Details |
-|---|---|---|
-| 1 | Input | 28×28×1 grayscale |
-| 2 | Conv2D | 32 filters, 3×3, ReLU, same padding |
-| 3 | BatchNormalization | — |
-| 4 | MaxPooling2D | 2×2 |
-| 5 | Conv2D | 64 filters, 3×3, ReLU, same padding |
-| 6 | BatchNormalization | — |
-| 7 | MaxPooling2D | 2×2 |
-| 8 | Conv2D | 128 filters, 3×3, ReLU, same padding |
-| 9 | BatchNormalization | — |
-| 10 | Flatten | — |
-| 11 | Dense | 256 units, ReLU |
-| 12 | Dropout | 0.5 |
-| 13 | Output | 10 units, Softmax |
+| Layer | Operation | Output Shape | Parameters |
+|:---|:---|:---|:---|
+| **Input** | Grayscale Tensor | `(28, 28, 1)` | 0 |
+| **Conv2D_1** | 32 filters, 3×3 kernel, valid pad, ReLU | `(26, 26, 32)` | 320 |
+| **MaxPool_1** | 2×2 max pooling, stride 2 | `(13, 13, 32)` | 0 |
+| **Conv2D_2** | 64 filters, 3×3 kernel, valid pad, ReLU | `(11, 11, 64)` | 18,496 |
+| **MaxPool_2** | 2×2 max pooling, stride 2 | `(5, 5, 64)` | 0 |
+| **Flatten** | 5 × 5 × 64 | `(1600,)` | 0 |
+| **Dense_1** | Fully connected, ReLU | `(64,)` | 102,464 |
+| **Dense_2** | Classification layer, Softmax | `(10,)` | 650 |
+| **Total** | — | — | **121,930 Parameters** (~489 KB) |
 
 ---
 
-## 🏷️ Supported Categories
-
-| # | Category | Emoji |
-|---|---|---|
-| 0 | T-shirt/top | 👕 |
-| 1 | Trouser | 👖 |
-| 2 | Pullover | 🧥 |
-| 3 | Dress | 👗 |
-| 4 | Coat | 🥼 |
-| 5 | Sandal | 👡 |
-| 6 | Shirt | 👔 |
-| 7 | Sneaker | 👟 |
-| 8 | Bag | 👜 |
-| 9 | Ankle boot | 👢 |
-
----
-
-## 📊 Model Performance
-
-| Metric | Value |
-|---|---|
-| Training Epochs | Up to 20 (EarlyStopping) |
-| Optimizer | Adam + ReduceLROnPlateau |
-| Loss Function | Categorical Crossentropy |
-| Data Augmentation | Rotation, Shift, Zoom, Flip |
-| Validation Accuracy | ~91%+ |
-| Test Accuracy | ~91%+ |
-
----
-
-## 🚀 Getting Started
+## 🚀 Quickstart & Local Setup
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/OxDurgeshxO/fashion-mnist-classifier.git
-cd fashion-mnist-classifier
+git clone https://github.com/OxDurgeshxO/CNN-STREAMLIT.git
+cd CNN-STREAMLIT
 ```
 
-### 2. Install Dependencies
+### 2. Install Lightweight Dependencies
 ```bash
 pip install -r requirements.txt
 ```
+*(Dependencies: `streamlit`, `numpy`, `pillow`, `plotly`)*
 
-### 3. Train the Model
-```bash
-python train_model.py
-```
-This downloads the Fashion MNIST dataset automatically, trains the CNN, and saves `fashion_mnist_cnn.keras` to the project directory.
-
-### 4. Run the Application
+### 3. Launch the App
 ```bash
 streamlit run app.py
 ```
-Open `http://localhost:8501` in your browser.
+Open your browser at `http://localhost:8501`.
 
 ---
 
-## ☁️ Deploy to Streamlit Cloud
+## 🔬 Standalone Training (Optional)
 
-1. Fork this repo
-2. Add `fashion_mnist_cnn.keras` to the repo root (train locally and commit, or use Git LFS)
-3. Go to [share.streamlit.io](https://share.streamlit.io), connect your GitHub, and deploy `app.py`
+If you wish to train the model from scratch using TensorFlow/Keras:
 
-> **Note:** The `.keras` model file is git-ignored by default. For Streamlit Cloud deployment, either commit the file directly (if <50MB) or use [Git LFS](https://git-lfs.github.com/).
+```bash
+python train_model.py
+```
+This script downloads Fashion MNIST via `tf.keras.datasets`, executes training with data augmentation and early stopping, exports `model_weights.npz`, and outputs validation metrics.
 
 ---
 
-## 🛠️ Tech Stack
+## 📂 Repository Structure
 
-| Layer | Technology |
-|---|---|
-| Deep Learning | TensorFlow / Keras |
-| Frontend | Streamlit |
-| Charts | Plotly |
-| Image Processing | NumPy, Pillow |
-| Data Augmentation | Keras ImageDataGenerator |
+```text
+CNN-STREAMLIT/
+├── .streamlit/
+│   └── config.toml               # Streamlit styling & theme overrides
+├── sample_images/                # Pre-extracted test samples across categories
+│   ├── Ankle_boot.png
+│   ├── Bag.png
+│   ├── Coat.png
+│   ├── Dress.png
+│   ├── Pullover.png
+│   ├── T-shirt.png
+│   └── Trouser.png
+├── app.py                        # Main Streamlit application & vectorized inference
+├── model_weights.npz             # Bundled pre-trained model weights (489 KB)
+├── train_model.py                # Standalone model training & weights export script
+├── requirements.txt              # Production dependency manifest
+├── LICENSE                       # MIT License
+└── README.md                     # Documentation & live demo links
+```
+
+---
+
+## 👨‍💻 Author
+
+**Durgesh Dutt Sinha**  
+- **GitHub:** [@OxDurgeshxO](https://github.com/OxDurgeshxO)  
+- **Live Streamlit App:** [cnn-app-dmfd7b76fxyrnvrhzpkgay.streamlit.app](https://cnn-app-dmfd7b76fxyrnvrhzpkgay.streamlit.app/)
