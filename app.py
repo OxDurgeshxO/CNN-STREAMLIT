@@ -21,6 +21,7 @@ CLASS_EMOJIS = ["👕", "👖", "🧶", "👗", "🧥", "👡", "👔", "👟", 
 
 # ── Sidebar Architecture & Specs ─────────────────────────────────────────────
 with st.sidebar:
+    st.info("🏷️ BETA AUDIT PREVIEW - Live Verification Mode")
     st.markdown("### 🧠 CNN Architecture")
     st.caption("Deep CNN trained on 60,000 Fashion-MNIST images")
     st.table({
@@ -104,6 +105,7 @@ def predict_fashion(img_28x28, w):
 
 # ── Main Header ──────────────────────────────────────────────────────────────
 st.title("👗 Fashion MNIST Image Classifier")
+st.markdown("`🏷️ BETA AUDIT PREVIEW`")
 st.write(
     "Upload a clothing photo (JPG/PNG) or pick one of the sample test items. "
     "The CNN normalizes it to 28×28 grayscale, detects background contrast, and performs real-time classification."
