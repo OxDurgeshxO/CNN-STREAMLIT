@@ -1,5 +1,10 @@
 # 👗 Fashion MNIST Image Classifier (CNN + Streamlit)
 
+[![CNN Model CI](https://github.com/OxDurgeshxO/CNN-STREAMLIT/actions/workflows/ci.yml/badge.svg)](https://github.com/OxDurgeshxO/CNN-STREAMLIT/actions)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cnn-app-dmfd7b76fxyrnvrhzpkgay.streamlit.app/)
 [![Python Version](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue.svg)](https://github.com/OxDurgeshxO/CNN-STREAMLIT)
 [![Test Accuracy](https://img.shields.io/badge/test%20accuracy-~91.4%25-brightgreen.svg)](https://github.com/OxDurgeshxO/CNN-STREAMLIT)
