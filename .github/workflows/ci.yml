@@ -1,4 +1,7 @@
 name: CNN Model CI
+permissions:
+  contents: read
+
 
 on:
   push:
